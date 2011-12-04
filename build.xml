@@ -1,0 +1,47 @@
+<project default="compile">
+
+    <property name="src" value="src"/>
+    <property name="lib" value="lib"/>
+    <property name="my.first.junit.test" value="com.homedev.tests.JunitTest"/>
+    <property name="build.out" value="build"/>
+    <property name="classes" value="${build.out}/classes"/>
+    <property name="javadoc" value="${build.out}/javadoc"/>
+
+    <target name="test" depends="compile">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="${my.first.junit.test}"/>
+            <formatter type="plain" usefile="false"/>
+            <classpath refid="project.classpath"/>
+        </junit>
+    </target>
+
+    <path id="project.classpath">
+        <pathelement location="${classes}"/>
+        <pathelement location="/lib/junit-4.8.2.jar"/>
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.out}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes}"/>
+        <javac srcdir="src" destdir="${classes}" classpathref="project.classpath"/>
+    </target>
+
+    <target name="build.jar.file" depends="compile">
+        <jar destfile="${build.out}/TimerGS.jar" basedir="src">
+            <manifest>
+                <attribute name="Main-Class" value="com.homedev.timergs.TimerFrame"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="doc">
+        <mkdir dir="${javadoc}"/>
+        <javadoc destdir="${javadoc}" sourcepath="src" packagenames="*"/>
+    </target>
+</project>
