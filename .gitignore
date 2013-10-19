@@ -1,0 +1,7 @@
+*.swp
+build/
+*.iml
+*.ipr
+*.iws
+out/
+*.bak
