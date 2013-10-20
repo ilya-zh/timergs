@@ -19,6 +19,12 @@ public class SettingsManager
     PropertiesManager.getInstance().setProperty( SettingsKeys.ALWAYS_ON_TOP, b ? "ON" : "OFF" );
   }
 
+  public static boolean isDebugEnabled()
+  {
+    final String property = PropertiesManager.getInstance().getProperty( SettingsKeys.DEBUG_ENABLED );
+    return Fn.isStringPopulated( property ) && property.equalsIgnoreCase( "true" );
+  }
+
   public static void commit()
   {
     PropertiesManager.getInstance().storeProperties();

@@ -1,16 +1,15 @@
 package com.homedev.timergs;
 
+import com.homedev.timergs.sound.SoundManager;
 import com.homedev.timergs.utilities.LoggerGS;
 import com.homedev.timergs.utilities.SettingsManager;
 import com.homedev.timergs.utilities.TimerActionListener;
-import com.sun.media.sound.JavaSoundAudioClip;
 
 import javax.swing.*;
-import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -21,31 +20,18 @@ public class TimerLogic
 {
   public Timer timer;
   public int seconds = 60;
-  protected int timeUntilSwitchOff;
-  private JLabel displayLbl;
-  private JComboBox timeToWait_cmb;
+  protected int timeUntilSwitchOff;//seconds
+  private final JLabel displayLbl;
+  private final JComboBox timeToWait_cmb;
   private final String[] PROCESSES_PREVENTING_HIBERNATION = { "realplay" };
   public static final String WIN_SCREEN_SAVER = "C:\\Windows\\System32\\GPhotos.scr /s";
-  private AudioClip audioClip;
-
-  public LoggerGS getOffLogger()
-  {
-    return offLogger;
-  }
-
+  private final SoundManager soundManager = new SoundManager();
   private LoggerGS offLogger;
-//    private ArrayList<String> errors = new ArrayList<String>();
 
-
-  public TimerLogic( JLabel displayLbl, JComboBox timeToWait_cmb )
+  public TimerLogic( final JLabel displayLbl, final JComboBox timeToWait_cmb )
   {
     this.displayLbl = displayLbl;
     this.timeToWait_cmb = timeToWait_cmb;
-    offLogger = new LoggerGS( "time.log" );
-//        final String propsError = propertiesManager.getErrorCode();
-//        if ( propsError != null ) errors.add( propsError );
-
-
   }
 
   public void init()
@@ -63,7 +49,6 @@ public class TimerLogic
   }
 
   private void saveLastTimerSetting()
-    throws IOException
   {
     SettingsManager.setLastTimerSetting( getSelectedComboSetting() );
     SettingsManager.commit();
@@ -83,7 +68,7 @@ public class TimerLogic
   {
     timer = new Timer( 0, new ActionListener()
     {
-      public void actionPerformed( ActionEvent e )
+      public void actionPerformed( final ActionEvent e )
       {
         final int secondsToDisplay = timeUntilSwitchOff % 60;
         updateTimeDisplay( timeUntilSwitchOff / 60 + ":"
@@ -91,7 +76,7 @@ public class TimerLogic
 
         if ( isTimeToWarnOfImminentShutDown() )
         {
-          doBeep();
+          doFiveBeeps();
         }
         if ( timeUntilSwitchOff == 0 )
         {
@@ -106,7 +91,7 @@ public class TimerLogic
 
   private boolean isTimeToWarnOfImminentShutDown()
   {
-    return timeUntilSwitchOff < 61 && timeUntilSwitchOff > 54;
+    return timeUntilSwitchOff == 60;
   }
 
   private void turnOffComputerAndExit()
@@ -166,20 +151,20 @@ public class TimerLogic
     final String time = new Date().toString();
     SettingsManager.setLastShutdownTime( time );
     SettingsManager.commit();
-    offLogger.log( "Shutting down...the time is now: " + time );
+    getOffLogger().log( "Shutting down...the time is now: " + time );
 
   }
 
   protected void setDisplayTimeUntilShutDown()
   {
-    int index = getSelectedComboSetting();
+    final int index = getSelectedComboSetting();
     if ( index == 0 )
     {
-      timeUntilSwitchOff = 1;
+      timeUntilSwitchOff = 60;
     }
     else if ( index == 1 )
     {
-      timeUntilSwitchOff = 5 + 60;
+      timeUntilSwitchOff = 300;
     }
     else if ( index == getNumberOfComboSettings() - 1 )
     {
@@ -192,16 +177,15 @@ public class TimerLogic
     }
 
 //        timeUntilSwitchOff *= 60;
-    updateTimeDisplay( String.valueOf( timeUntilSwitchOff / 60 ) + ":" + "00" );
+    updateTimeDisplay( timeUntilSwitchOff / 60 + ":" + "00" );
   }
 
-
-  private void updateTimeDisplay( String s )
+  private void updateTimeDisplay( final String s )
   {
     displayLbl.setText( s );
   }
 
-  private void setSelectedComboSetting( int lastSetting )
+  private void setSelectedComboSetting( final int lastSetting )
   {
     timeToWait_cmb.setSelectedIndex( lastSetting );
   }
@@ -218,56 +202,21 @@ public class TimerLogic
 
   protected void doBeep()
   {
-    if ( audioClip == null )
-    {
-      activateScreenSaver();
-      try
-      {
-        InputStream stream = getClass().getResourceAsStream( "sounds/ding.wav" );
-
-
-        audioClip = new JavaSoundAudioClip( stream );
-      }
-      catch ( IOException e )
-      {
-        //Failed to load sound file
-      }
-//            catch ( URISyntaxException e )
-//            {
-//                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//            }
-    }
-//        Toolkit.getDefaultToolkit().beep();
-    if ( audioClip != null )
-    {
-      SwingUtilities.invokeLater( new Runnable()
-      {
-        public void run()
-        {
-          audioClip.play();
-        }
-      } );
-    }
+    soundManager.doBeep();
   }
 
-  private void activateScreenSaver()
+  protected void doFiveBeeps()
   {
-    //                String substring = stream2.
-//                if ( timeUntilSwitchOff == 60 )
-//                {
-//                    URL url = getClass().getResource( "screensavers/scrnsave.scr" );
-//                    File file = new File( url.toURI() );
+    soundManager.doFiveBeeps();
+  }
 
-//                    String replace = substring.replaceAll( "/", "\\" );
-//                    JOptionPane.showMessageDialog( null, stream2 ==null? "null":stream2.toString() );
-//                    String fileName = ClassLoader.getSystemResource("/scrnsave.scr").getFile();
-//                    Runtime.getRuntime().exec( "rundll32 url.dll,FileProtocolHandler " + fileName );
-//                    JOptionPane.showMessageDialog( null, "null" );
-//                    File file = new File( "scrnsave.scr" );
-//                    Runtime.getRuntime().exec( "", null, file );
-//                }
-
-//                JOptionPane.showMessageDialog( null,url.getFile() );
+  private LoggerGS getOffLogger()
+  {
+    if ( offLogger == null )
+    {
+      offLogger = new LoggerGS( "time.log" );
+    }
+    return offLogger;
   }
 
   protected void loadLastSetting()
@@ -285,7 +234,7 @@ public class TimerLogic
 
   public class TimerActionListenerImpl implements TimerActionListener
   {
-    public TimerActionListenerImpl( Component component )
+    public TimerActionListenerImpl( final Component component )
     {
       if ( component instanceof JLabel )
       {

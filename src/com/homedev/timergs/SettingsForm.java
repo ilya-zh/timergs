@@ -14,9 +14,9 @@ import java.awt.event.ActionEvent;
 public class SettingsForm extends JFrame
 {
   private static final Insets INSETS = new Insets( 5, 5, 5, 5 );
-  private TimerFrame timerFrame;
+  private final TimerFrame timerFrame;
 
-  public SettingsForm( TimerFrame timerFrame )
+  public SettingsForm( final TimerFrame timerFrame )
   {
     super( "Settings" );
     setAlwaysOnTop( true );
@@ -28,20 +28,20 @@ public class SettingsForm extends JFrame
 
   private void setupUI()
   {
-    JPanel mainPane = new JPanel( new GridBagLayout() );
+    final JPanel mainPane = new JPanel( new GridBagLayout() );
     mainPane.setBorder( BorderFactory.createEmptyBorder() );
 
     mainPane.add( createGenralOptionsPane(), getDefaultLayout( 0 ) );
     mainPane.add( createPathToScreenSaverPane(), getDefaultLayout( 1 ) );
 
-    GridBagConstraints c = getMainSettingsPanelLayout();
+    final GridBagConstraints c = getMainSettingsPanelLayout();
     add( mainPane, c );
     c.gridx = 0;
     c.gridy = GridBagConstraints.RELATIVE;
     c.weighty = 1;
     add( Box.createVerticalGlue(), c );
 
-    JPanel buttonGroup = getButtonGroup();
+    final JPanel buttonGroup = getButtonGroup();
     add( buttonGroup, getDefaultLayout( GridBagConstraints.RELATIVE ) );
 
     initSize();
@@ -50,7 +50,7 @@ public class SettingsForm extends JFrame
 
   private GridBagConstraints getMainSettingsPanelLayout()
   {
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     c.weightx = 0.1;
     c.weighty = 0;
@@ -60,27 +60,27 @@ public class SettingsForm extends JFrame
 
   private JPanel createGenralOptionsPane()
   {
-    JPanel ganeral = new JPanel( new GridBagLayout() );
+    final JPanel ganeral = new JPanel( new GridBagLayout() );
 
     //construct checkbox
-    JLabel alwOnTopLbl = new JLabel( "Always on top: " );
+    final JLabel alwOnTopLbl = new JLabel( "Always on top: " );
 
-    JCheckBox alwOnTop = new JCheckBox();
-    alwOnTop.addActionListener( new AlwayOnTopAction( alwOnTop ) );
+    final JCheckBox alwOnTop = new JCheckBox();
+    alwOnTop.addActionListener( new AlwaysOnTopAction( alwOnTop ) );
     alwOnTop.setSelected( SettingsManager.isAlwaysOnTopSetting() );
     alwOnTopLbl.setLabelFor( alwOnTop );
 
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     c.weightx = 0;
     c.insets = new Insets( 5, 5, 5, 0 );
     ganeral.add( alwOnTopLbl, c );
     c.weightx = 1;
     ganeral.add( alwOnTop, c );
-    String title = "General";
+    final String title = "General";
     ganeral.setName( title );
 
-    TitledBorder titledBorder = getTitledBorder( title );
+    final TitledBorder titledBorder = getTitledBorder( title );
 
     ganeral.setBorder( titledBorder );
     return ganeral;  //To change body of created methods use File | Settings | File Templates.
@@ -88,11 +88,11 @@ public class SettingsForm extends JFrame
 
   private JPanel createPathToScreenSaverPane()
   {
-    JPanel pane = new JPanel( new GridBagLayout() );
-    JTextField pathToScreensaver = new JTextField( "", 20 );
+    final JPanel pane = new JPanel( new GridBagLayout() );
+    final JTextField pathToScreensaver = new JTextField( "", 20 );
 
     //configure label
-    JLabel pathToSLable = new JLabel( "Path to screensaver" + ": " );
+    final JLabel pathToSLable = new JLabel( "Path to screensaver" + ": " );
     pathToSLable.setLabelFor( pathToScreensaver );
     GridBagConstraints c = new GridBagConstraints();
     c.gridy = 0;
@@ -114,7 +114,7 @@ public class SettingsForm extends JFrame
     pane.add( pathToScreensaver, c );
 
     //add button
-    JButton button = new JButton();
+    final JButton button = new JButton();
     button.setText( "Choose" );
     Fn.defaultButtonSize( button );
     c = new GridBagConstraints();
@@ -133,15 +133,15 @@ public class SettingsForm extends JFrame
 
   private JPanel getButtonGroup()
   {
-    JPanel buttonGroup = new JPanel( new GridBagLayout() );
+    final JPanel buttonGroup = new JPanel( new GridBagLayout() );
 
-    JButton cancel = new JButton( "Cancel" );
-    JButton saveChanges = new JButton( "Save changes" );
+    final JButton cancel = new JButton( "Cancel" );
+    final JButton saveChanges = new JButton( "Save changes" );
     Fn.defaultButtonSize( cancel );
     Fn.defaultButtonSize( saveChanges );
     saveChanges.addActionListener( new SaveAction() );
     cancel.addActionListener( new CancelAction() );
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.LAST_LINE_END;
     c.fill = GridBagConstraints.NONE;
     c.gridy = 0;
@@ -156,9 +156,9 @@ public class SettingsForm extends JFrame
     return buttonGroup;
   }
 
-  private GridBagConstraints getDefaultLayout( int currentRow )
+  private GridBagConstraints getDefaultLayout( final int currentRow )
   {
-    GridBagConstraints c = new GridBagConstraints();
+    final GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     c.fill = GridBagConstraints.HORIZONTAL;
     c.weightx = 0.1;
@@ -174,8 +174,8 @@ public class SettingsForm extends JFrame
 
   private void initSize()
   {
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    Dimension appSize = getDefaultSize();
+    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    final Dimension appSize = getDefaultSize();
     if ( appSize.height > screenSize.height ) appSize.height = screenSize.height;
     if ( appSize.width > screenSize.width ) appSize.width = screenSize.width;
     setSize( appSize );
@@ -189,26 +189,26 @@ public class SettingsForm extends JFrame
     return new Dimension( 500, 300 );
   }
 
-  private void centreOnScreen( Dimension screenSize, Dimension appSize )
+  private void centreOnScreen( final Dimension screenSize, final Dimension appSize )
   {
     setLocation( ( screenSize.width - appSize.width ) / 2, ( screenSize.height - appSize.height ) / 2 );
   }
 
-  private TitledBorder getTitledBorder( String title )
+  private TitledBorder getTitledBorder( final String title )
   {
     return BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(), title );
   }
 
-  private class AlwayOnTopAction extends AbstractAction
+  private class AlwaysOnTopAction extends AbstractAction
   {
-    private JCheckBox alwOnTop;
+    private final JCheckBox alwOnTop;
 
-    public AlwayOnTopAction( JCheckBox alwOnTop )
+    private AlwaysOnTopAction( final JCheckBox alwOnTop )
     {
       this.alwOnTop = alwOnTop;
     }
 
-    public void actionPerformed( ActionEvent e )
+    public void actionPerformed( final ActionEvent e )
     {
       SettingsManager.setAlwaysOnTop( alwOnTop.isSelected() );
     }
@@ -216,20 +216,20 @@ public class SettingsForm extends JFrame
 
   private class SaveAction extends AbstractAction
   {
-    public void actionPerformed( ActionEvent e )
+    public void actionPerformed( final ActionEvent e )
     {
       timerFrame.setAlwaysOnTop( SettingsManager.isAlwaysOnTopSetting() );
       SettingsManager.commit();
-      SettingsForm.this.dispose();
+      dispose();
     }
   }
 
   private class CancelAction extends AbstractAction
   {
-    public void actionPerformed( ActionEvent e )
+    public void actionPerformed( final ActionEvent e )
     {
       SettingsManager.cancel();
-      SettingsForm.this.dispose();
+      dispose();
     }
   }
 }
