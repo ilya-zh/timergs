@@ -1,9 +1,11 @@
 package com.homedev.timergs;
 
 import com.homedev.timergs.sound.SoundManager;
-import com.homedev.timergs.utilities.LoggerGS;
+import com.homedev.timergs.utilities.ShutdownExecutor;
+import com.homedev.timergs.utilities.loggers.DebugLogger;
 import com.homedev.timergs.utilities.SettingsManager;
 import com.homedev.timergs.utilities.TimerActionListener;
+import com.homedev.timergs.utilities.loggers.TrackingLogger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +15,7 @@ import java.io.IOException;
 import java.util.Date;
 
 /**
- * User: Ilya Zhuravliov, Date: 04-Mar-2009 Time: 22:02:29
+ * Main class containing the decision making code User: Ilya Zhuravliov, Date: 04-Mar-2009 Time: 22:02:29
  */
 
 public class TimerLogic
@@ -23,11 +25,9 @@ public class TimerLogic
   protected int timeUntilSwitchOff;//seconds
   private final JLabel displayLbl;
   private final JComboBox timeToWait_cmb;
-  private final String[] PROCESSES_PREVENTING_HIBERNATION = { "realplay" };
-  public static final String WIN_SCREEN_SAVER = "C:\\Windows\\System32\\GPhotos.scr /s";
   private final SoundManager soundManager = new SoundManager();
-  private LoggerGS offLogger;
-
+  private TrackingLogger offLogger;
+  private ShutdownExecutor shutdownExecutor = new ShutdownExecutor();
   public TimerLogic( final JLabel displayLbl, final JComboBox timeToWait_cmb )
   {
     this.displayLbl = displayLbl;
@@ -82,7 +82,7 @@ public class TimerLogic
         {
           timer.stop();
           saveLastShutdownTime();
-          turnOffComputerAndExit();
+          shutdownExecutor.turnOffComputerAndExit();
         }
         timeUntilSwitchOff--;
       }
@@ -94,64 +94,12 @@ public class TimerLogic
     return timeUntilSwitchOff == 60;
   }
 
-  private void turnOffComputerAndExit()
-  {
-    try
-    {
-      turnOffPC();
-      exit();
-    }
-    catch ( IOException e1 )
-    {
-      e1.printStackTrace();
-    }
-  }
-
-  private void turnOffPC()
-    throws IOException
-  {
-    tryKillingProcessesPreventingShutdown();
-    tryHibernate();
-    tryShutdown();
-  }
-
-  private void tryHibernate()
-    throws IOException
-  {
-    final Runtime runtime = Runtime.getRuntime();
-    runtime.exec( "powercfg -h on" );//try enabling hibernate
-    runtime.exec( "rundll32.exe PowrProf.dll,SetSuspendState" );//hibernate
-  }
-
-  private void tryShutdown()
-    throws IOException
-  {
-//    Runtime.getRuntime().exec( "Shutdown -h -t 15 -c \"TimerGS is shutting down this computer\"" );
-//    Runtime.getRuntime().exec( "shutdown -h" );
-    Runtime.getRuntime().exec( "Shutdown -s" );
-  }
-
-  private void exit()
-  {
-    Runtime.getRuntime().exit( 0 );
-  }
-
-  private void tryKillingProcessesPreventingShutdown()
-    throws IOException
-  {
-    for ( final String s : PROCESSES_PREVENTING_HIBERNATION )
-    {
-      System.out.println( "Killing " + s + "..." );
-      Runtime.getRuntime().exec( "tskill " + s );//kill process
-    }
-  }
-
   private void saveLastShutdownTime()
   {
     final String time = new Date().toString();
     SettingsManager.setLastShutdownTime( time );
     SettingsManager.commit();
-    getOffLogger().log( "Shutting down...the time is now: " + time );
+    getOffLogger().logInfo( "Shutting down...the time is now: " + time );
 
   }
 
@@ -210,11 +158,11 @@ public class TimerLogic
     soundManager.doFiveBeeps();
   }
 
-  private LoggerGS getOffLogger()
+  private TrackingLogger getOffLogger()
   {
     if ( offLogger == null )
     {
-      offLogger = new LoggerGS( "time.log" );
+      offLogger = new TrackingLogger();
     }
     return offLogger;
   }

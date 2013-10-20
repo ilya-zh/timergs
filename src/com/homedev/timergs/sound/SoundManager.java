@@ -1,6 +1,7 @@
 package com.homedev.timergs.sound;
 
-import com.homedev.timergs.utilities.LoggerGS;
+import com.homedev.timergs.utilities.loggers.DebugLogger;
+import com.homedev.timergs.utilities.loggers.LoggerGS;
 import com.homedev.timergs.utilities.SettingsManager;
 import com.sun.media.sound.JavaSoundAudioClip;
 
@@ -18,18 +19,18 @@ public class SoundManager
 {
   private static final String DING_WAV = "ding.wav";
   private AudioClip warningSound = null;
-  private LoggerGS soundLogger;
+  private DebugLogger soundLogger;
 
   public SoundManager()
   {
     initWarningSound();
   }
 
-  private LoggerGS getSoundLogger()
+  private DebugLogger getSoundLogger()
   {
     if ( soundLogger == null )
     {
-      soundLogger = new LoggerGS( "soundsDebug.log" );
+      soundLogger = new DebugLogger( "soundsDebug.log" );
     }
     return soundLogger;
   }
@@ -73,7 +74,7 @@ public class SoundManager
   {
     if ( SettingsManager.isDebugEnabled() )
     {
-      getSoundLogger().log( s );
+      getSoundLogger().logDebug( s );
     }
   }
 
