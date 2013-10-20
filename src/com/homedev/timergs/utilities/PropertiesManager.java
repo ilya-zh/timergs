@@ -2,96 +2,156 @@ package com.homedev.timergs.utilities;
 
 import com.homedev.timergs.TimerFrame;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.Properties;
 
 /**
- * User: Admin
- * Date: 08-Mar-2009
- * Time: 08:54:07
+ * @author Ilya Zhuravliov, Date: 08-Mar-2009 Time: 08:54:07
  */
 public class PropertiesManager
 {
-    private final Properties properties = new Properties();
-    private final File PROPERTIES_FILE;
-    private final String DEFAULT_PROPERTIES_FILE_NAME;
-    private String errorCode = null;
+  private final Properties properties = new Properties();
+  private String errorCode = null;
+  private final static String PROPERTIES_FILE_NAME = "settings.properties";
+  private final static String DEFAULT_PROPERTIES_FILE_NAME = "defaultSettings.properties";
+  private final File propertiesFile;
+  private static PropertiesManager propertiesManager;
 
-    public PropertiesManager( String propertiesFileName, String defPropsFileName )
+  public static PropertiesManager getInstance()
+  {
+    if ( propertiesManager == null )
     {
-        PROPERTIES_FILE = new File(propertiesFileName);
-        DEFAULT_PROPERTIES_FILE_NAME = defPropsFileName;
+      propertiesManager = new PropertiesManager();
+    }
+    return propertiesManager;
+  }
+
+  private PropertiesManager()
+  {
+    propertiesFile = new File( PROPERTIES_FILE_NAME );
+    try
+    {
+      setupProps();
+    }
+    catch ( IOException e )
+    {
+      errorCode = e.getMessage();
+    }
+  }
+
+  private void setupProps()
+    throws IOException
+  {
+    if ( propertiesFile != null && propertiesFile.exists() )
+    {
+      loadProperties( propertiesFile );
+    }
+    else
+    {
+      loadDefaultProperties( DEFAULT_PROPERTIES_FILE_NAME );
+    }
+  }
+
+  private void loadDefaultProperties( final String defaultPropertiesFile )
+  {
+    final InputStream inputStream = TimerFrame.class.getResourceAsStream( defaultPropertiesFile );
+    try
+    {
+      properties.load( inputStream );
+    }
+    catch ( IOException e )
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void loadProperties( final File propertiesFile )
+  {
+    FileInputStream in = null;
+    try
+    {
+      in = new FileInputStream( propertiesFile );
+      properties.load( in );
+    }
+    catch ( FileNotFoundException e )
+    {
+      JOptionPane.showMessageDialog( null, e );
+    }
+    catch ( IOException e )
+    {
+      JOptionPane.showMessageDialog( null, e );
+    }
+    finally
+    {
+      if ( in != null )
+      {
         try
         {
-            setupProps();
+          in.close();
         }
         catch ( IOException e )
         {
-            errorCode = e.getMessage();
+          JOptionPane.showMessageDialog( null, e );
         }
+      }
     }
+  }
 
-    private void setupProps()
-            throws IOException
+  public synchronized void storeProperties()
+  {
+    FileOutputStream outputStream = null;
+    try
     {
-        if ( PROPERTIES_FILE != null && PROPERTIES_FILE.exists() )
-        {
-            loadProperties( PROPERTIES_FILE );
-        }
-        else
-        {
-            loadDefaultProperties( DEFAULT_PROPERTIES_FILE_NAME );
-        }
+//            propertiesFile.createNewFile();
+      outputStream = new FileOutputStream( propertiesFile );
+      properties.store( outputStream, "*-----TimeGS Settings-----*" );
     }
-
-    private void loadDefaultProperties( String defaultPropertiesFile )
+    catch ( IOException e )
     {
-        InputStream inputStream = TimerFrame.class.getResourceAsStream( defaultPropertiesFile );
+      e.printStackTrace();
+    }
+    finally
+    {
+      if ( outputStream != null )
+      {
         try
         {
-            properties.load( inputStream );
+          outputStream.close();
         }
         catch ( IOException e )
         {
-            e.printStackTrace();
+          //oh well, at least we tried...
         }
+      }
     }
+  }
 
-    private void loadProperties( File propertiesFile ) throws IOException
+  public synchronized void setProperty( final String key, final String value )
+  {
+    properties.setProperty( key, value );
+  }
+
+  public synchronized String getProperty( final String key )
+  {
+    return properties.getProperty( key );
+  }
+
+
+  public synchronized String getErrorCode()
+  {
+    return errorCode;
+  }
+
+  public synchronized void cancel()
+  {
+    try
     {
-        FileInputStream in = new FileInputStream( propertiesFile );
-        properties.load( in );
-        in.close();
+      setupProps();
     }
-
-    public void storeProperties()
+    catch ( IOException e )
     {
-        try
-        {
-            PROPERTIES_FILE.createNewFile();
-            FileOutputStream outputStream = new FileOutputStream( PROPERTIES_FILE );
-            properties.store( outputStream, "*-----TimeGS Settings-----*" );
-            outputStream.close();
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
+      JOptionPane.showMessageDialog( null, e );
     }
-
-    public void setProperty( String key, String value )
-    {
-        properties.setProperty( key, value );
-    }
-
-    public String getProperty( String key )
-    {
-        return properties.getProperty( key );
-    }
-
-
-    public String getErrorCode()
-    {
-        return errorCode;
-    }
+  }
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * User: Admin
+ * @author Ilya Zhuravliov
  * Date: 08-Mar-2009
  * Time: 11:17:21
  */
@@ -22,7 +22,7 @@ public class LoggerGS
             try
             {
                 logfile.createNewFile();
-                log( "# Logging started: time now is " + new Date().getTime() );
+                log( "# Logging started: time now is: " + new Date().toString() );
             }
             catch ( IOException e )
             {

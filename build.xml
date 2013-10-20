@@ -27,16 +27,24 @@
         <delete dir="${build.out}"/>
     </target>
 
-    <target name="compile">
+    <target name="compile" depends="clean">
         <mkdir dir="${classes}"/>
-        <javac srcdir="src" destdir="${classes}" classpathref="project.classpath"/>
+        <javac srcdir="${src}" destdir="${classes}" classpathref="project.classpath"/>
     </target>
 
     <target name="build.jar.file" depends="compile">
-        <jar destfile="${build.out}/TimerGS.jar" basedir="src">
+        <jar destfile="${build.out}/TimerGS.jar" basedir="${classes}">
             <manifest>
                 <attribute name="Main-Class" value="com.homedev.timergs.TimerFrame"/>
             </manifest>
+            <fileset dir="${src}">
+                <include name="**/*" />
+                <exclude name="**/tests*"/>
+            </fileset>
+            <fileset dir="${src}">
+                <include name="com/homedev/timergs/defaultSettings.properties" />
+            </fileset>
+
         </jar>
     </target>
 
