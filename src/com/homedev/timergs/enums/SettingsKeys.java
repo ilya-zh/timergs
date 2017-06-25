@@ -10,4 +10,5 @@ public class SettingsKeys
   public static final String DEBUG_ENABLED = "debugEnabled";
   public static final String LAST_TIMER_SETTING = "lastSetting";
   public static final String LAST_SHUTDOWN_TIME = "lastShutdownTime";
+  public static final String HIBERNATE = "hibernate";
 }

@@ -25,14 +25,13 @@ public class ShutdownExecutor
   private void turnOffPC()
   {
     tryKillingProcessesPreventingShutdown();
-    final boolean succeeded = tryHibernate();
-    if ( !succeeded )
+    if ( !SettingsManager.isHibernate() || !tryHibernateAndReportResult() )
     {
       tryShutdown();
     }
   }
 
-  private boolean tryHibernate()
+  private boolean tryHibernateAndReportResult()
   {
     getMainLogger().logDebug( "Trying to hibernate" );
     enableHibernate();

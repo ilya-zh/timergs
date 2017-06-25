@@ -56,4 +56,9 @@ public class SettingsManager
   {
     return PropertiesManager.getInstance().getProperty( SettingsKeys.LAST_SHUTDOWN_TIME );
   }
+
+  public static boolean isHibernate()
+  {
+    return Boolean.parseBoolean( PropertiesManager.getInstance().getProperty( SettingsKeys.HIBERNATE ) );
+  }
 }
