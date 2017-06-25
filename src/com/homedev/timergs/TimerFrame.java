@@ -67,7 +67,7 @@ public class TimerFrame extends JFrame
       }
     } );
 
-    displayLbl.setFont( new Font( Font.SANS_SERIF, Font.BOLD, 60 ) );
+    displayLbl.setFont( new Font( displayLbl.getName(), Font.BOLD, 60 ) );
 
     timeToWait_cmb.setModel( new DefaultComboBoxModel( ITEMS ) );
     timeToWait_cmb.addActionListener( new ActionListener()
